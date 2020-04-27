@@ -23,7 +23,7 @@ class App extends Component {
           .add(0, "days")
           .toDate(),
         title: "UrsaTech Meeting",
-        descrition: "WebDev",
+        description: "WebDev",
         link: "Zoom.com",
         location: "Online"
       },
@@ -31,19 +31,20 @@ class App extends Component {
         start: moment('2020.04.27').toDate(), 
         end: moment('2020-04-28').toDate(),
         title: "UrsaTech Meeting",
-        descrition: "WebDev",
+        description: "WebDev",
         link: "Zoom.com",
         location: "Online"
       }
     ],
     dropDownSelection: "Java 1",
-    modalIsOpen: false
-  };
-
-  onchangeSelectDropdown = e => {
-    this.setState({
-      dropDownSelection: e
-    });
+    modalIsOpen: false,
+    modalInfoIsOpen: false,
+    start: new Date(),
+    end: new Date(),
+    title: "",
+    description: "",
+    link: "",
+    location: ""
   };
 
   openModal = e => {
@@ -57,6 +58,32 @@ class App extends Component {
     //set model to true
     this.setState({
       modalIsOpen: false
+    });
+  }
+
+  openInfoModal = e => {
+    //set model to true
+    this.setState({
+      modalInfoIsOpen: true,
+      start: e.start,
+      end: e.end,
+      title: e.title,
+      description: e.description,
+      link: e.link,
+      location: e.location
+    });
+  }
+
+  closeInfoModal = e => {
+    //set model to true
+    this.setState({
+      modalInfoIsOpen: false,
+      start: new Date(),
+      end: new Date(),
+      title: "",
+      description: "",
+      link: "",
+      location: ""
     });
   }
 
@@ -179,6 +206,55 @@ class App extends Component {
     );
   }
 
+  renderInfoModal = () => {
+    const buttonS = {
+      background: "white", 
+      border: "none",
+      position: "absolute",
+      marginLeft: "95%",
+      width: "5%",
+      height: "5%"
+    };
+
+    const modalAdd = {
+      position: "absolute",
+      flexDirection: "column",
+      paddingLeft: "5%",
+    }
+    if (!this.state.modalInfoIsOpen) return;
+    const startS= this.state.start + ""
+    const startP = startS.split(" ");
+    const endS= this.state.start + ""
+    const endP = endS.split(" ");
+    const date = startP[1] + " " + startP[2] + ", " + startP[3];
+    const startT = startP[4]; 
+    const endT = endP[4]; 
+    alert(startS);
+    alert(endS);
+    //Mon,Apr,27,2020,00:00:00,GMT-0700,(Pacific,Daylight,Time)
+    return(
+      <Modal
+        isOpen={this.state.modalInfoIsOpen}
+        onRequestClose={this.closeInfoModal}
+        contentLabel="Add event"
+        show={this.state.modalInfoIsOpen}
+        style={{height: '60%'}}
+      >
+        <button type="button" class="close" aria-label="Close" onClick={this.closeInfoModal} style={buttonS}>
+          <span aria-hidden="true">&times;</span>
+        </button>      
+        <div style={{textAlign: "center" }}>Event Info</div>
+        <div> Title: {this.state.title}</div>
+        <div> Date: {date}</div>
+        <div> Start Time: {startT}</div>
+        <div> End Time: {endT}</div>
+        <div> Link: {this.state.link}</div>
+        <div> Description: {this.state.description}</div>
+         
+      </Modal>
+    );
+  }
+
   renderModalInfo = () => {
     
   }
@@ -203,12 +279,13 @@ class App extends Component {
             defaultDate={new Date()}
             defaultView="month"
             events={this.state.events}
-            onSelectEvent={event => alert(event.title)}
+            onSelectEvent={event => this.openInfoModal(event)}
             onSelectSlot={this.handleSelect}
             style={{ height: "88vh"}}
           />
           <button onClick={this.openModal}>Add an event</button>
           {this.renderModal()}
+          {this.renderInfoModal()}
         </div>
       </div>
     );
