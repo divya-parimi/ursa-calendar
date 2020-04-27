@@ -4,6 +4,8 @@ import moment from "moment";
 import Modal from 'react-bootstrap/Modal';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import MenuItem from '@material-ui/core/MenuItem';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import "./modal.css";
 
 import "./App.css";
@@ -20,12 +22,18 @@ class App extends Component {
         end: moment()
           .add(0, "days")
           .toDate(),
-        title: "UrsaTech Meeting"
+        title: "UrsaTech Meeting",
+        descrition: "WebDev",
+        link: "Zoom.com",
+        location: "Online"
       },
       {
-        start: moment('2020-04-27').toDate(),
+        start: moment('2020.04.27').toDate(), 
         end: moment('2020-04-28').toDate(),
-        title: "UrsaTech Meeting"
+        title: "UrsaTech Meeting",
+        descrition: "WebDev",
+        link: "Zoom.com",
+        location: "Online"
       }
     ],
     dropDownSelection: "Java 1",
@@ -51,38 +59,128 @@ class App extends Component {
       modalIsOpen: false
     });
   }
+
+  handleSubmit(event) {
+    event.preventDefault(event);
+    moment.defaultFormat = "DD-MM-YYYY HH:mm";
+    const eventsC = this.state.events.slice();
+    const start = event.target.date.value + " " + event.target.startTime.value;
+    const end = event.target.date.value + " " + event.target.endTime.value;
+    //alert(end);
+    this.setState({
+      events: eventsC.concat([
+        { 
+          title: event.target.title.value,
+          start: moment(start).toDate(),
+          end: moment(end).toDate(),
+          description: event.target.description.value,
+          link: event.target.link.value,
+          location: event.target.location.value
+        }
+      ])
+    });
+    this.closeModal();
+    //alert(this.state.events);
+  }
   
   renderModal = () => {
     const buttonS = {
+      background: "white", 
+      border: "none",
       position: "absolute",
-      marginTop: "55%",
-      marginLeft: "43%",
+      marginLeft: "95%",
+      width: "5%",
+      height: "5%"
     };
+
+    const modalAdd = {
+      position: "absolute",
+      flexDirection: "column",
+      paddingLeft: "5%",
+    }
+    
     if (!this.state.modalIsOpen) return;
     return(
       <Modal
         isOpen={this.state.modalIsOpen}
         onRequestClose={this.closeModal}
-        contentLabel="Example Modal"
+        contentLabel="Add event"
         show={this.state.modalIsOpen}
+        style={{height: '60%'}}
       >
-        <button onClick={this.closeModal} style={buttonS}>close</button>
-        <div style={{ marginLeft: '40%' }}>Add event</div>
-        <form>
-          <input />
-          <DropdownButton title={"Dates"} key="1" id="test" onSelect={this.onchangeSelectDropdown} >
-            <MenuItem eventKey="Option  1"> Option 1</MenuItem>
-            <MenuItem eventKey="Option 2"> Option 2</MenuItem>
-            <MenuItem eventKey="Option 3"> Option 3</MenuItem>
-  
-            <MenuItem divider />
-            <MenuItem eventKey="Other">Other</MenuItem>
-          </DropdownButton>
-  
-          <input type="submit" value="Submit" />
+        <button type="button" class="close" aria-label="Close" onClick={this.closeModal} style={buttonS}>
+          <span aria-hidden="true">&times;</span>
+        </button>      
+        <div style={{textAlign: "center" }}>Add event</div>
+        <form onSubmit={(e) => this.handleSubmit(e)} style={modalAdd}>
+        
+          <input
+              id="title"
+              type="text"
+              placeholder={"Title"}
+              style={{marginTop: "5%"}}
+            />
+          <TextField
+            id="date"
+            label="Date"
+            type="date"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            style={{marginTop: "13%", marginLeft: "-38%"}}
+          />
+          <TextField
+            id="startTime"
+            label="Start Time"
+            type="time"
+            defaultValue="00:00"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              step: 300, // 5 min
+            }}
+            style={{marginTop: "27%", marginLeft: "-38%"}}
+          />
+          <TextField
+            id="endTime"
+            label="End Time"
+            type="time"
+            defaultValue="00:00"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              step: 300, // 5 min
+            }}
+            style={{marginTop: "25.5%", marginLeft: "5%", position: "absolute"}}
+          />
+          <input
+              id="link"
+              type="text"
+              placeholder={"Link"}
+              style={{marginTop: "40%", marginLeft: "-23%", position: "absolute", width: "50%"}}
+          />
+          <input
+              id="location"
+              type="text"
+              placeholder={"Location"}
+              style={{marginTop: "48%", marginLeft: "-23%", position: "absolute", width: "50%"}}
+          />
+          <textarea 
+            id="description"
+            type="text"
+            placeholder={"Description"}
+            style={{marginTop: "56%", marginLeft: "-23%", position: "absolute", width: "80%", height: "50%"}}
+          />
+          <input type="submit" value="Submit" style={{position: "absolute", marginLeft: "20%" , marginTop: "85%"}}/>
         </form>
       </Modal>
     );
+  }
+
+  renderModalInfo = () => {
+    
   }
 
   render() {
@@ -116,5 +214,7 @@ class App extends Component {
     );
   }
 }
+
+//descriptions, event url, venue, add event
 
 export default App;
