@@ -61,6 +61,29 @@ class App extends Component {
     });
   }
 
+  deleteEvent = e => {
+    for (let i = 0; i < this.state.events.length; i += 1) {
+      let curr =  this.state.events[i];
+      let titleC = curr.title == this.state.title;
+      let descriptionC = curr.description == this.state.description;
+      let linkC = curr.link == this.state.link;
+      let locationC = curr.location == this.state.location;
+      let startC = curr.start == this.state.start;
+      let endC = curr.end == this.state.end;
+      if (titleC && descriptionC && linkC && locationC && startC && endC) {
+        let updated = this.state.events.slice(0);
+        updated.splice(i, 1);
+        this.setState({
+          events: updated,
+          modalInfoIsOpen: false
+        });
+      }
+    }
+    this.setState({
+      modalInfoIsOpen: false
+    });
+  }
+
   openInfoModal = e => {
     //set model to true
     this.setState({
@@ -93,7 +116,6 @@ class App extends Component {
     const eventsC = this.state.events.slice();
     const start = event.target.date.value + " " + event.target.startTime.value;
     const end = event.target.date.value + " " + event.target.endTime.value;
-    //alert(end);
     this.setState({
       events: eventsC.concat([
         { 
@@ -107,7 +129,6 @@ class App extends Component {
       ])
     });
     this.closeModal();
-    //alert(this.state.events);
   }
   
   renderModal = () => {
@@ -200,7 +221,7 @@ class App extends Component {
             placeholder={"Description"}
             style={{marginTop: "56%", marginLeft: "-23%", position: "absolute", width: "80%", height: "50%"}}
           />
-          <input type="submit" value="Submit" style={{position: "absolute", marginLeft: "20%" , marginTop: "85%"}}/>
+          <input type="submit" value="Submit" style={{position: "absolute", marginLeft: "19%" , marginTop: "85%"}}/>
         </form>
       </Modal>
     );
@@ -222,16 +243,28 @@ class App extends Component {
       paddingLeft: "5%",
     }
     if (!this.state.modalInfoIsOpen) return;
-    const startS= this.state.start + ""
-    const startP = startS.split(" ");
-    const endS= this.state.start + ""
-    const endP = endS.split(" ");
+    const startP = (this.state.start + "").split(" ");
+    const endP = (this.state.end + "").split(" ");
     const date = startP[1] + " " + startP[2] + ", " + startP[3];
-    const startT = startP[4]; 
-    const endT = endP[4]; 
-    alert(startS);
-    alert(endS);
+    let startT = startP[4].slice(0, 5);
+    let endT = endP[4].slice(0, 5);
+    let sHour = startT[0] == "0" ? startT.slice(1, 2) : startT.slice(0, 2);
+    let eHour = endT[0] == "0" ? endT.slice(1, 2) : endT.slice(0, 2);
+    if (parseInt(startP[4].slice(0, 3)) < 12) {  
+      startT = (parseInt(sHour) % 12) + startT.slice(2) + " A.M";
+    } else {
+      startT = (startT.slice(0, 2) % 12) + startT.slice(2) + " P.M";
+    }
+    if (parseInt(endP[4].slice(0, 3)) < 12) {
+      endT = (parseInt(eHour) % 12) + endT.slice(2) + " A.M";
+    } else {
+      endT = (endT.slice(0, 2) % 12) + endT.slice(2) + " P.M";
+    }
     //Mon,Apr,27,2020,00:00:00,GMT-0700,(Pacific,Daylight,Time)
+    let linkF = this.state.link;
+    if (linkF.slice(0, 8) != "https://") {
+      linkF = "https://" + linkF;
+    }
     return(
       <Modal
         isOpen={this.state.modalInfoIsOpen}
@@ -248,9 +281,9 @@ class App extends Component {
         <div> Date: {date}</div>
         <div> Start Time: {startT}</div>
         <div> End Time: {endT}</div>
-        <div> Link: {this.state.link}</div>
+        <div> Link: <a target="_blank" href={linkF}> {linkF}</a></div>
         <div> Description: {this.state.description}</div>
-         
+        <button type="button" onClick={this.deleteEvent} style={{marginTop: "50%", marginLeft:"40%"}}>Delete Event</button>        
       </Modal>
     );
   }
